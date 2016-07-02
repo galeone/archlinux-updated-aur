@@ -7,6 +7,7 @@ RUN pacman -Sy haveged archlinux-keyring --noconfirm && haveged -w 1024 -v 1 && 
     git subversion nodejs npm gcc-libs --noconfirm && pacman-db-upgrade
 
 RUN useradd -m -s /bin/bash aur && echo "aur ALL = NOPASSWD: /usr/bin/pacman" >> /etc/sudoers
+RUN mkdir -p /etc/pki/tls/certs && cp /etc/ssl/certs/ca-certificates.crt /etc/pki/tls/certs/ca-bundle.crt
 
 USER aur
 ENV PATH /usr/bin/core_perl:$PATH
