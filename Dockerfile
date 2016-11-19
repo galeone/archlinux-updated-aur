@@ -1,13 +1,23 @@
 FROM base/archlinux
 MAINTAINER Paolo Galeone <nessuno@nerdz.eu>
 
-RUN pacman -Sy haveged archlinux-keyring --noconfirm && haveged -w 1024 -v 1 && \
-    pacman-key --init && pacman-key --populate archlinux && pacman -Syy && \
-    pacman -Su base-devel yajl wget ca-certificates openssl \
-    git subversion nodejs npm gcc-libs --noconfirm && pacman-db-upgrade
+
+
+RUN pacman -Syy pacman haveged archlinux-keyring --noconfirm && haveged -w 1024 -v 1 && \
+    pacman-key --init && pacman-key --populate archlinux && pacman-db-upgrade
+
+RUN cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup && \
+    sed -i 's/^#Server/Server/' /etc/pacman.d/mirrorlist.backup && \
+    rankmirrors -n 6 /etc/pacman.d/mirrorlist.backup > /etc/pacman.d/mirrorlist && \
+    pacman -Syy
+
+RUN pacman -Su base-devel yajl wget ca-certificates ca-certificates-cacert \
+    openssl ca-certificates-mozilla ca-certificates-utils git subversion \ 
+    nodejs npm gcc-libs --noconfirm
 
 RUN useradd -m -s /bin/bash aur && echo "aur ALL = NOPASSWD: /usr/bin/pacman" >> /etc/sudoers
-RUN mkdir -p /etc/pki/tls/certs && ln -s /etc/ca-certificates/extracted/tls-ca-bundle.pem /etc/pki/tls/certs/ca-bundle.crt
+RUN mkdir -p /etc/pki/tls/certs && \
+    ln -s /etc/ca-certificates/extracted/tls-ca-bundle.pem /etc/pki/tls/certs/ca-bundle.crt
 
 USER aur
 ENV PATH /usr/bin/core_perl:$PATH
