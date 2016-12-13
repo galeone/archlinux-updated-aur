@@ -1,15 +1,8 @@
 FROM base/archlinux
 MAINTAINER Paolo Galeone <nessuno@nerdz.eu>
 
-
-
 RUN pacman -Syy pacman haveged archlinux-keyring --noconfirm && haveged -w 1024 -v 1 && \
-    pacman-key --init && pacman-key --populate archlinux && pacman-db-upgrade
-
-RUN cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup && \
-    sed -i 's/^#Server/Server/' /etc/pacman.d/mirrorlist.backup && \
-    rankmirrors -n 6 /etc/pacman.d/mirrorlist.backup > /etc/pacman.d/mirrorlist && \
-    pacman -Syy
+    pacman-key --init && pacman-key --populate archlinux && pacman-db-upgrade && pacman -Syy
 
 RUN pacman -Su base-devel yajl wget ca-certificates ca-certificates-cacert \
     openssl ca-certificates-mozilla ca-certificates-utils git subversion \ 
